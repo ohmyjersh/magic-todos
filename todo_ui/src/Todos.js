@@ -12,9 +12,9 @@ const TodosWrapper = styled.ul`
 
 export default ({token}) => {
   const [todos, setTodos] = useState([]);
+  const [todoId, setTodoEdit] = useState('');
   const getData = async () => {
-    const result = await doGetTodos
-  (token)
+    const result = await doGetTodos(token)
     !!result ? setTodos(result.data) : setTodos([]);
   }
   useEffect(async () => {
@@ -23,7 +23,7 @@ export default ({token}) => {
 return(  
 <FlexColumn>
   <TodoHeader />
-  <TodosWrapper> { todos.map(x => <Todo {...{id:x.id, description:x.description, completed:x.completed, getData, token}} />)}</TodosWrapper>
+  <TodosWrapper> { todos.map((x,i) => <Todo key={i} {...{isEdit:(x.id === todoId),id:x.id, description:x.description, completed:x.completed, getData, token, setTodoEdit}} />)}</TodosWrapper>
   <AddTodo {...{token, getData}} />
 </FlexColumn>)
 }

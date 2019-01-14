@@ -1,8 +1,20 @@
 import styled from 'styled-components';
 
 export const InputWrapper = styled.input`
+  box-sizing : border-box;
   width:100%;
-  padding: 10px;
+  padding: 5px 10px;
+  font-size: 1em;
+  border: solid 1px #e0e0e0;
+  border-radius: .5em;
+  &:focus {
+    outline: none;
+  }
+`;
+
+export const CheckBoxWrapper = styled.input`
+  box-sizing : border-box;
+  margin: 10px;
   font-size: 1em;
   border: solid 1px #e0e0e0;
   border-radius: .5em;
@@ -41,7 +53,7 @@ export const ButtonWrapper = styled.button`
   &:focus {
     border:none;
   }
-`;
+`
 
 export const FlexColumn = styled.section`
   background-color: #ffffff;

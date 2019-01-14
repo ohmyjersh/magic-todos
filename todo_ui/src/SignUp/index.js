@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import Error from '../Error';
 import {Post} from '../Request';
 import {views} from '../constants';
-import {FormWrapper, InputWrapper, ButtonWrapper, FlexColumn, ButtonGroup} from '../Styles';
+import {FormWrapper, InputWrapper, ButtonWrapper, ButtonGroup} from '../Styles';
 import Loading from '../Loading';
 import {useApiWithData} from '../useApi';
 
@@ -18,9 +18,9 @@ export default ({setView, setSuccessToken}) => {
   const match = passwordsMatch(password, passwordConfirmation);
   return(<FormWrapper>
     {isLoading ? <Loading /> : <React.Fragment>
-      <InputWrapper placeholder="Email" name="email" autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
-      <InputWrapper placeholder="Password" type="password" autoComplete="off" name="password" value={password} onChange={e => setPassword(e.target.value)} />
-      <InputWrapper placeholder="Password Confirmation" autoComplete="off" type="password" name="confirmation" value={passwordConfirmation} onChange={e => setPasswordConfirmation(e.target.value)}/>
+      <InputWrapper placeholder="email" name="email" autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} />
+      <InputWrapper placeholder="password" type="password" autoComplete="off" name="password" value={password} onChange={e => setPassword(e.target.value)} />
+      <InputWrapper placeholder="password confirmation" autoComplete="off" type="password" name="confirmation" value={passwordConfirmation} onChange={e => setPasswordConfirmation(e.target.value)}/>
       {match ? <Error message="Passwords do not match."/> : null }
       <ButtonGroup>
         <ButtonWrapper backgroundColor="#df0e0ee6" onClick={e => setView(views.login)}>Cancel</ButtonWrapper>

@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Put} from '../Request';
-import {InputWrapper, ButtonWrapper} from '../Styles';
+import {InputWrapper, CheckBoxWrapper} from '../Styles';
 import {useApiWithData} from '../useApi';
 import Error from '../Error';
 import Loading from '../Loading';
@@ -14,38 +14,38 @@ const onSuccessCallBack = getTodosFunc => () => {
 const TodoWrapper = styled.li`
   display:flex;
   justify-content:space-between;
+  width:100%;
 `;
 
-export default ({id, description, completed, getData, token}) => {
-  const [isEdit, setIsEdit] = useState(false);
+export default ({isEdit, id, description, completed, getData, token, setTodoEdit}) => {
   const [isLoading, isError, asyncUpdateTodo] = useApiWithData(doUpdateTodo(token), [200,201], onSuccessCallBack(getData))
  return (<TodoWrapper>
   { isEdit
-    ? 
-    <EditTodo {...{id, completed,description,setIsEdit, asyncUpdateTodo}} />
-    : <DisplayTodo {...{setIsEdit, description}} />
+    ? isLoading 
+      ? <Loading /> 
+      : <EditTodo {...{id, completed,description, setTodoEdit, asyncUpdateTodo}} />
+    : <DisplayTodo {...{setTodoEdit, id, description}} />
   }
-    <input name="complete" type="checkbox" checked={completed} onChange={async e => await asyncUpdateTodo({id, todo: {description, completed: !completed}})}/>
+    <CheckBoxWrapper name="complete" type="checkbox" checked={completed} onChange={async e => await asyncUpdateTodo({id, todo: {description, completed: !completed}})}/>
 </TodoWrapper>)}
 
-
-const EditTodoWrapper = styled.div`
-  display:flex;
-  justify-content:space-between;
-`;
-
-const EditTodo = ({id, completed,description, setIsEdit, asyncUpdateTodo}) => {  
+const EditTodo = ({id, completed,description, setTodoEdit, asyncUpdateTodo}) => {  
   const [editTodo, setEditTodo] = useState(description);
-  return (<EditTodoWrapper>
-          <InputWrapper value={editTodo} onChange={e => setEditTodo(e.target.value)}/>
-          <ButtonWrapper onClick={async e => { await asyncUpdateTodo({id, todo: {description: editTodo, completed:completed}}); setIsEdit(false)}}>update</ButtonWrapper>
-          </EditTodoWrapper>) 
+  const handleChange = async e => {
+    if(e.key === 'Enter') {
+      await asyncUpdateTodo({id, todo: {description: editTodo, completed:completed}}); 
+      setTodoEdit('')
+    }
+  }
+  return (<InputWrapper value={editTodo} nKeyPress={e => handleChange(e)} onChange={e => setEditTodo(e.target.value)}/>) 
 }
 
 const DisplayTodoWrapper = styled.div`
   display:flex;
   word-break:break-all;
+  padding:5px 0px;
+  width:100%;
 `;
-const DisplayTodo = ({setIsEdit, description}) => (
-  <DisplayTodoWrapper onClick={ e => { setIsEdit(true)}}>{description}</DisplayTodoWrapper>
+const DisplayTodo = ({setTodoEdit, id, description}) => (
+  <DisplayTodoWrapper onClick={ e => { setTodoEdit(id)}}>{description}</DisplayTodoWrapper>
 )
