@@ -30,7 +30,7 @@ defmodule TodoApi.Accounts.User do
   defp put_password(%Ecto.Changeset{valid?: true, changes: %{password: pass}} = changeset) do
     put_change(changeset, :password_hash, hashpwsalt(pass))
   end
-  defp put_password() do
+  defp put_password(changeset) do
     changeset
   end
 
