@@ -3,27 +3,27 @@ version: '3'
 
 # Containers we are going to run
 services:
-  #Our eliir service container
-  service:
-    # The build parameters for this container.
-    build:
-      # Here we define that it should build from the current directory
-      context: ./todo_service
-    environment:
-      # Variables to connect to our Postgres server
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: todo_api_test
-      PGPORT: 5432
-      # Hostname of our Postgres container
-      PGHOST: db
-      KAFKAHOST: kafka
-      MIX_ENV: integration
-    depends_on:
-      # The db container needs to be started before we start this container
-      - db
-      - kafka
-      - phoenix
+  # #Our eliir service container
+  # service:
+  #   # The build parameters for this container.
+  #   build:
+  #     # Here we define that it should build from the current directory
+  #     context: ./todo_service
+  #   environment:
+  #     # Variables to connect to our Postgres server
+  #     PGUSER: postgres
+  #     PGPASSWORD: postgres
+  #     PGDATABASE: todo_api_test
+  #     PGPORT: 5432
+  #     # Hostname of our Postgres container
+  #     PGHOST: db
+  #     KAFKAHOST: kafka
+  #     MIX_ENV: integration
+  #   depends_on:
+  #     # The db container needs to be started before we start this container
+  #     - db
+  #     - kafka
+  #     - phoenix
   phoenix:
     # The build parameters for this container.
     build:
@@ -68,6 +68,8 @@ services:
 
   kafka:
     image: wurstmeister/kafka:0.10.2.1
+    expose:
+      - "9092"
     ports:
       - "9092:9092"
     links:
