@@ -1,11 +1,17 @@
 defmodule Fyre do
-  use Application
-  require Logger
+  use GenServer # MOVE TO BE AN AGENT TO HANDLE OWN STATE?
   @base_url "http://localhost:4002/api/v1"
-  @usage_timeout 20000
 
-  @spec start(any(), any()) :: no_return()
-  def start(_type, _args) do
+  def start_link(_args) do
+    GenServer.start_link __MODULE__, %{}, name: Fyre
+  end
+
+  def init(init_arg) do
+    start()
+    {:ok, init_arg}
+  end
+
+  def start() do
     email = UUID.uuid4() <> "@thing.com"
     password = "c00lstuff"
     newUser = %{"user" => %{"email" => email, "password" => password, "passwordConfirmation" => password}}
@@ -14,26 +20,21 @@ defmodule Fyre do
     authUser = %{"email" => email, "password" => password}
     authTokenBody = Poison.encode!(authUser);
     token = sign_in(authTokenBody)
-    todo = %{"todo" => %{"description" => "does this thing work", "completed" => false}}
-    todoBody = Poison.encode!(todo)
-    todos = generate_todos(todoBody)
+    todos = generate_todos()
+    GenServer.cast(:collector, {:handle_requests, todos})
+    GenServer.cast(:collector, {:request_start_time})
+    Process.sleep(10000)
     fireOffAsync(todos, token)
-    things = []
-    KafkaEx.create_worker(:streaming_worker)
-    for message <- KafkaEx.stream("test", 0, worker_name: :streaming_worker) do
-      json = Poison.decode!(message.value)
-      List.insert_at(things, -1, json)
-    end
-    IO.inspect things
+    GenServer.cast(:collector, {:request_end_time})
   end
 
+  #helpers
   defp headers(token) do
     [{"Authorization", "Bearer #{token}"}, {"Content-Type", "application/json"}]
   end
   defp headers() do
     [{"Content-type", "application/json"}]
   end
-
   defp sign_up(params) do
    response = HTTPoison.post!(@base_url <> "/sign_up", params, headers())
    token = Poison.decode!(response.body)
@@ -47,15 +48,17 @@ defmodule Fyre do
   defp create_todo(params, token) do
     HTTPoison.post!(@base_url <> "/todos/delayed", params, headers(token))
   end
+
   defp update_todo(id, params, token) do
     HTTPoison.put!(@base_url <> "/todos" <> id, params, headers(token))
   end
 
-  def generate_todos(todo), do: Enum.reduce(0..9, [], fn _, acc ->
+  defp generate_todos(), do: Enum.reduce(0..9, [], fn _, acc ->
+    todo = %{"todo" => %{"description" => UUID.uuid4(), "completed" => false}} |> Poison.encode!
     [todo | acc]
   end)
 
-  def fireOffAsync(todos, token) do
+  defp fireOffAsync(todos, token) do
     todos
     |> Enum.map(&(Task.async(fn -> create_todo(&1, token) end)))
     |> Enum.map(&Task.await/1)

@@ -20,7 +20,7 @@ defmodule Fyre.MixProject do
   def application do
 
     [
-      mod: { Fyre, [] },
+      mod: { Fyre.Application, [] },
       extra_applications: [
         :logger,
         :kafka_ex,
