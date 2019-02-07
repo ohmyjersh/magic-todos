@@ -23,7 +23,7 @@ defmodule Fyre do
     todos = generate_todos()
     GenServer.cast(:collector, {:handle_requests, todos})
     GenServer.cast(:collector, {:request_start_time})
-    Process.sleep(10000)
+    Process.sleep(10000) # here to just add some latency for time diff testing
     fireOffAsync(todos, token)
     GenServer.cast(:collector, {:request_end_time})
   end

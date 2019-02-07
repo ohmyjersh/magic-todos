@@ -1,2 +1,4 @@
-# magic-todos
-micro service architecture for todos
+# Firingsquad
+
+**TODO: Add description**
+

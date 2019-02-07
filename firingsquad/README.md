@@ -1,4 +1,0 @@
-# Firingsquad
-
-**TODO: Add description**
-
