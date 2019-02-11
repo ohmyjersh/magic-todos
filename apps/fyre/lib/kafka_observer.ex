@@ -1,8 +1,8 @@
 defmodule KafkaObserver do
   use GenServer # MOVE TO BE AN AGENT TO HANDLE OWN STATE?
 
-  def start_link(_args) do
-    GenServer.start_link __MODULE__, {}, name: :kafkaobserver
+  def start_link(args) do
+    GenServer.start_link __MODULE__, args, name: :kafkaobserver
   end
 
   def init(state) do

@@ -5,8 +5,8 @@ defmodule Collector do
     defstruct messages: [], requests: [], request_start_time: nil, request_end_time: nil, requests_processing: false
   end
 
-  def start_link(_args) do
-    GenServer.start_link __MODULE__, %State{}, name: :collector
+  def start_link(args) do
+    GenServer.start_link __MODULE__, Map.merge(%State{}, args), name: :collector
   end
 
   def init(state) do
@@ -18,6 +18,9 @@ defmodule Collector do
   end
   def handle_call(:get_requests, _from, state) do
     {:reply, state.requests, state}
+  end
+  def handle_call(:get_max_length, _from, state) do
+    {:reply, state.max_length, state}
   end
 
   def handle_call(:get_request_times, _from, state) do
@@ -42,10 +45,10 @@ defmodule Collector do
     newState = Map.put(state, :request_end_time, Time.utc_now())
     {:noreply, newState }
   end
-  def handle_cast({:handle_requests, request}, state) do
+  def handle_cast({:handle_request, request}, state) do
     requests = state.requests
-    cleanedUp = Enum.map(request, fn x -> get_todo(x) end)
-    newRequests = requests ++ cleanedUp
+    cleanedUp = get_todo(request)
+    newRequests = requests ++ [cleanedUp]
     newState = Map.put(state, :requests, newRequests)
     {:noreply, newState }
   end
